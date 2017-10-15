@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
 import {Container, Col, Row, Card, CardText, CardBlock, CardTitle, ListGroup, ListGroupItem} from 'reactstrap';
-import sampleStory1 from '../data/sample-story-1.json';
+import sampleStory1 from '../services/data/sample-story-1.json';
 
 class SignOption extends PureComponent {
   handleSceneChange = () => {

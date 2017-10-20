@@ -1,8 +1,8 @@
-import React, {PureComponent} from 'react';
-import {Container, Col, Row, Card, CardText, CardBlock, CardTitle, ListGroup, ListGroupItem} from 'reactstrap';
-import sampleStory1 from '../services/data/sample-story-1.json';
+import React, {Component} from 'react';
+import {Container, Col, Row, Card, CardText, CardBody, CardTitle, ListGroup, ListGroupItem} from 'reactstrap';
+import {getStoryInfo, getScene} from "../services/storyTimeServiceApi";
 
-class SignOption extends PureComponent {
+class SignOption extends Component {
   handleSceneChange = () => {
     const {destination, onClick} = this.props;
     onClick(destination);
@@ -41,7 +41,7 @@ const Signpost = (props) => {
   );
   return (
     <Card>
-      <CardBlock>
+      <CardBody>
         <CardTitle>{signpost.prompt}</CardTitle>
         <CardText tag="div">
           <Row>
@@ -49,31 +49,32 @@ const Signpost = (props) => {
             <Col>{optionList}</Col>
           </Row>
         </CardText>
-      </CardBlock>
+      </CardBody>
     </Card>
   );
-}
+};
 
 const Scene = (props) => {
   const {title, prose} = props.scene;
   return (
     <Card id="scene">
-      <CardBlock>
+      <CardBody>
         <CardTitle>{title}</CardTitle>
         <CardText>{prose}</CardText>
-      </CardBlock>
+      </CardBody>
     </Card>
   );
 };
 
-export default class ReaderPage extends PureComponent {
+export default class ReaderPage extends Component {
 
   constructor() {
     super();
-    const firstScene = sampleStory1.scenes[sampleStory1.summary.firstScene];
+    const story = getStoryInfo('blargy');
+    const scene = getScene(story.summary.key, story.summary.firstScene);
     this.state = {
-      currentStory: sampleStory1,
-      currentScene: firstScene
+      currentStory: story,
+      currentScene: scene
     };
     console.log(this.state);
 
@@ -82,8 +83,8 @@ export default class ReaderPage extends PureComponent {
 
   handleSceneChange = (sceneKey) => {
     console.log('scene change', sceneKey);
-    const story = this.state.currentStory;
-    const scene = story.scenes[sceneKey];
+    const {currentStory} = this.state;
+    const scene = getScene(currentStory.summary.key, sceneKey);  // TODO use thunk to invoke action
     if (scene) {
       this.setState({currentScene: scene});
     } else {
@@ -93,9 +94,10 @@ export default class ReaderPage extends PureComponent {
 
   render() {
     const {currentStory, currentScene} = this.state;
+    console.log(currentStory, currentScene);
     return (
       <Container id="reader" fluid={true}>
-        <h1 id="story-title">{currentStory.summary.title}</h1>
+        <h1 id="story-title">{currentStory.summary.title}, by {currentStory.summary.author}</h1>
         <Scene scene={currentScene}/>
         <Signpost signpost={currentScene.signpost} onSceneChange={this.handleSceneChange}/>
       </Container>
